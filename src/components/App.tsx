@@ -1,12 +1,12 @@
 import { CSSProperties, useState } from 'react';
 import clsx from 'clsx';
 
-import { Article } from './components/article/Article';
-import { ArticleParamsForm } from './components/article-params-form/ArticleParamsForm';
-import { defaultArticleState } from './constants/articleProps';
+import { Article } from './article/Article';
+import { ArticleParamsForm } from './article-params-form/ArticleParamsForm';
+import { defaultArticleState } from '../constants/articleProps';
 
-import './styles/index.scss';
-import styles from './styles/index.module.scss';
+import '../styles/index.scss';
+import styles from '../styles/index.module.scss';
 
 export const App = () => {
 	const [styleVars, setStyleVars] = useState<CSSProperties>({

@@ -13,8 +13,8 @@ type Story = StoryObj<typeof Spacing>;
 export const SpacingStory: Story = {
 	argTypes: {
 		height: {
-			options: [4, 24, 50, 90, 207]
-		}
+			options: [4, 24, 50, 90, 207],
+		},
 	},
 	render: (args) => {
 		return (
