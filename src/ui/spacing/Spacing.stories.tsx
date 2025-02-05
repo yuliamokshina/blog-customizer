@@ -18,7 +18,8 @@ export const SpacingStory: Story = {
 	},
 	render: (args) => {
 		return (
-			<div style={{"border": "solid 3px black", "width": "100%"} as CSSProperties}>
+			<div
+				style={{ border: 'solid 3px black', width: '100%' } as CSSProperties}>
 				<Spacing {...args} />
 			</div>
 		);

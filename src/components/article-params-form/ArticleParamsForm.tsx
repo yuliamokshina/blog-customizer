@@ -1,10 +1,18 @@
-import { createRef } from 'react';
+import { createRef, CSSProperties, useState } from 'react';
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
-import { useState } from 'react';
 import { Select } from 'src/ui/select';
 import { Text } from 'src/ui/text';
-import { fontFamilyOptions, fontSizeOptions, fontColors, backgroundColors, contentWidthArr, OptionType } from 'src/constants/articleProps';
+import {
+	fontFamilyOptions,
+	fontSizeOptions,
+	fontColors,
+	backgroundColors,
+	contentWidthArr,
+	OptionType,
+	defaultArticleState,
+	ArticleStateType,
+} from 'src/constants/articleProps';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 import { Spacing } from 'src/ui/spacing';
@@ -12,60 +20,92 @@ import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 import styles from './ArticleParamsForm.module.scss';
 
 type ArticleParamsFormProps = {
-	updateStyle: (newStyle: {}) => void;
+	updateStyle: (newStyle: CSSProperties) => void;
+	articleStates: ArticleStateType;
 };
 
 export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
-	const [isOpen, openForm] = useState<boolean>(false);
+	const [isOpen, setFormPosition] = useState<boolean>(false);
+	const rootRef = createRef<HTMLDivElement>();
 
 	const changeFormPosition = () => {
-		openForm(!isOpen)
-	}
-	const rootRef = createRef<HTMLDivElement>()
+		setFormPosition(!isOpen);
+	};
+
+	const closeForm = () => {
+		setFormPosition(false);
+	};
+
 	useOutsideClickClose({
 		isOpen,
 		rootRef: rootRef,
-		onClose: changeFormPosition,
-		onChange: openForm,
-	})
+		onClose: closeForm,
+		onChange: setFormPosition,
+	});
 
-	const [selectedFont, setSelectedFont] = useState<OptionType>(fontFamilyOptions[0]);
-	const [selectedFontSize, setSelectedFontSize] = useState<OptionType>(fontSizeOptions[0]);
-	const [selectedFontColor, setSelectedFontColor] = useState<OptionType>(fontColors[0]);
-	const [selectedBackgroundColor, setSelectedBackgroundColor] = useState<OptionType>(backgroundColors[0]);
-	const [selectedContentWidthArr, setSelectedContentWidthArr] = useState<OptionType>(contentWidthArr[0]);
-
-	const clear = () => {
-		setSelectedFont(fontFamilyOptions[0])
-		setSelectedFontSize(fontSizeOptions[0])
-		setSelectedFontColor(fontColors[0])
-		setSelectedBackgroundColor(backgroundColors[0])
-		setSelectedContentWidthArr(contentWidthArr[0])
-	}
+	const [selectedFont, setSelectedFont] = useState<OptionType>(
+		props.articleStates.fontFamilyOption
+	);
+	const [selectedFontSize, setSelectedFontSize] = useState<OptionType>(
+		props.articleStates.fontSizeOption
+	);
+	const [selectedFontColor, setSelectedFontColor] = useState<OptionType>(
+		props.articleStates.fontColor
+	);
+	const [selectedBackgroundColor, setSelectedBackgroundColor] =
+		useState<OptionType>(props.articleStates.backgroundColor);
+	const [selectedContentWidthArr, setSelectedContentWidthArr] =
+		useState<OptionType>(props.articleStates.contentWidth);
 
 	const apply = () => {
 		props.updateStyle({
-			"--bg-color": selectedBackgroundColor.value,
-			"--container-width": selectedContentWidthArr.value,
-			"--font-color": selectedFontColor.value,
-			"--font-size": selectedFontSize.value,
-			"--font-family": selectedFont.value
-		})
-	}
+			'--bg-color': selectedBackgroundColor.value,
+			'--container-width': selectedContentWidthArr.value,
+			'--font-color': selectedFontColor.value,
+			'--font-size': selectedFontSize.value,
+			'--font-family': selectedFont.value,
+		} as CSSProperties);
+	};
+
+	const clear = () => {
+		setSelectedFont(defaultArticleState.fontFamilyOption);
+		setSelectedFontSize(defaultArticleState.fontSizeOption);
+		setSelectedFontColor(defaultArticleState.fontColor);
+		setSelectedBackgroundColor(defaultArticleState.backgroundColor);
+		setSelectedContentWidthArr(defaultArticleState.contentWidth);
+		props.updateStyle({
+			'--font-family': defaultArticleState.fontFamilyOption.value,
+			'--font-size': defaultArticleState.fontSizeOption.value,
+			'--font-color': defaultArticleState.fontColor.value,
+			'--container-width': defaultArticleState.contentWidth.value,
+			'--bg-color': defaultArticleState.backgroundColor.value,
+		} as CSSProperties);
+	};
+
+	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		apply();
+	};
 
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={changeFormPosition} />
-			<aside ref={rootRef} className={isOpen ? styles.container + " " + styles.container_open : styles.container}>
-				<form className={styles.form}>
+			<aside
+				ref={rootRef}
+				className={
+					isOpen
+						? styles.container + ' ' + styles.container_open
+						: styles.container
+				}>
+				<form className={styles.form} onSubmit={handleSubmit}>
 					<Text
-						as={"h2"}
-						children="задайте параметры"
+						as={'h2'}
 						weight={800}
 						size={31}
 						family='open-sans'
-						uppercase={true}
-					/>
+						uppercase={true}>
+						задайте параметры
+					</Text>
 					<Spacing />
 					<Select
 						selected={selectedFont}
@@ -106,8 +146,13 @@ export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
 					/>
 					<Spacing height={207} />
 					<div className={styles.bottomContainer}>
-						<Button onClick={clear} title='Сбросить' htmlType='reset' type='clear' />
-						<Button onClick={apply} title='Применить' htmlType='button' type='apply' />
+						<Button
+							onClick={clear}
+							title='Сбросить'
+							htmlType='reset'
+							type='clear'
+						/>
+						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>
 			</aside>
